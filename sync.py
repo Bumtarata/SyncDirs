@@ -1,8 +1,20 @@
-import shutil, sys, os
+"""Simple folder synchronizing app. When running you need to provide other
+commandline arguments. Run command should look like this:
+
+python3 sync.py 'path to source directory' 'path where destination directory
+should be made' 'path to file where logs will be written' 'type of unit' 'number
+of units'
+
+Write those arguments without ticks(').
+Type of unit - seconds, minutes, hours
+Synchronization will run at running the script and then after every number of
+units. For ending a script use KeyboardInterrupt."""
+
+import shutil, sys, time
 from datetime import datetime
 from pathlib import Path
 
-import pytz
+import pytz, schedule
 
 class SynchDirs():
     """Class used for synchronizing content of destination directory according
@@ -99,3 +111,21 @@ class SynchDirs():
 if __name__ == '__main__':
     synch = SynchDirs(Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3]))
     synch.synchronize()
+    
+    time_unit = sys.argv[4]
+    num_of_units = int(sys.argv[5])
+    
+    if time_unit == 'seconds':
+        schedule.every(num_of_units).seconds.do(synch.synchronize)
+    elif time_unit == 'minutes':
+        schedule.every(num_of_units).minutes.do(synch.synchronize)
+    elif time_unit == 'hours':
+        schedule.every(num_of_units).hours.do(synch.synchronize)
+    
+    while True:
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+        except KeyboardInterrupt:
+            schedule.cancel_job(synch.synchronize)
+            break
