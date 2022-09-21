@@ -32,7 +32,7 @@ pip install -r requirements.txt
 Run command:
 
 ```bash
-python sync_dirs.py [source directory] [destination directory] [log_file] [number] [time unit]
+python sync_dirs.py [-h] (-u {seconds, minutes, hours} -n | -o) source destination log_file
 ```
 
 Source directory should a path to directory which contents will be checked and
@@ -44,10 +44,21 @@ be created (also with all parent directories if needed).
 
 Log_file should be a path leading to a file where the script will write all changes.
 
-Number is used with time unit to calculate how often should script synchronize
-files.
+-n/--number is used with time unit (-u, --unit) to calculate how often should script
+synchronize files.
 
-Time unit could be either seconds, minutes or hours.
+-u/--unit as time unit could be either seconds, minutes or hours.
+
+-o/--once is used if you want to do file synchronization only once.
+
+-h/--help is used to show help in console.
+
+Either -once or -unit and -number together needs to be provided.
+Typical run command would look something like this:
+
+```bash
+python sync_dirs.py C:\users\you\documents\src_dir C:\users\you\desktop\dst -u seconds -n 30
+```
 
 ## License
 

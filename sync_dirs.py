@@ -133,15 +133,22 @@ class SyncDirs():
                     
 if __name__ == '__main__':
     desc = 'Synchronize destination dir to exactly match the source dir.'
-    parser = argparse.ArgumentParser(description=desc)
+    usage_text = '%(prog)s: [-h] (-u {seconds, minutes, hours} -n | -o) source destination log_file'
+    parser = argparse.ArgumentParser(description=desc, usage=usage_text)
     parser.add_argument('source', help='path to the source directory')
     parser.add_argument('destination',
         help='path to the destination directory (if leads to non_existent dir, it will be created)')
     parser.add_argument('log_file', help='path to a file where script will write logs')
-    parser.add_argument('number', type=int, help='number; length of interval between each sync repeat')
-    parser.add_argument('unit', choices=['seconds', 'minutes', 'hours'],
+    parser.add_argument('-n', '--number', type=int, help='number; length of interval between each sync repeat')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-u', '--unit', choices=['seconds', 'minutes', 'hours'],
         help='choose time unit used to caltulation of sync repeat interval')
+    group.add_argument('-o', '--once', action='store_true', help='run synchronization only once')
     args = parser.parse_args()
+    
+    if args.unit and not args.number:
+        print("Exception: With -unit must be also provided -number")
+        sys.exit()
     
     sync = SyncDirs(
         Path(args.source).resolve(),
@@ -155,20 +162,21 @@ if __name__ == '__main__':
         
     sync.synchronize()
     
-    time_unit = args.unit
-    
-    if time_unit == 'seconds':
-        schedule.every(args.number).seconds.do(sync.synchronize)
-    elif time_unit == 'minutes':
-        schedule.every(args.number).minutes.do(sync.synchronize)
-    elif time_unit == 'hours':
-        schedule.every(args.number).hours.do(sync.synchronize)
-    
-    while True:
-        try:
-            schedule.run_pending()
-            time.sleep(1)
-        except KeyboardInterrupt:
-            schedule.cancel_job(sync.synchronize)
-            print('Ending sync_dirs.py')
-            break
+    if not args.once:
+        time_unit = args.unit
+        
+        if time_unit == 'seconds':
+            schedule.every(args.number).seconds.do(sync.synchronize)
+        elif time_unit == 'minutes':
+            schedule.every(args.number).minutes.do(sync.synchronize)
+        elif time_unit == 'hours':
+            schedule.every(args.number).hours.do(sync.synchronize)
+        
+        while True:
+            try:
+                schedule.run_pending()
+                time.sleep(1)
+            except KeyboardInterrupt:
+                schedule.cancel_job(sync.synchronize)
+                print('Ending sync_dirs.py')
+                break
