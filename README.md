@@ -1,9 +1,9 @@
 # SyncDirs
 
-SyncDirs is a simple script for repeatedly one-way synchronization of two folders.
-At start and then after given time interval it looks into destination directory
-and compares its content with source directory. If there is anything missing or
-absent in destination directory it is copied there or removed from there respectively.
+SyncDirs is a simple script for repetitive one-way synchronization of two folders.
+At the start and then after given time interval it looks into destination directory
+and compares its contents with source directory. If there is anything missing or
+extra in destination directory it is copied there or removed from there respectively.
 Files are also copied if last modified time of file in source directory is different
 than last modified time of corresponding file in destination directory.
 Right before any change in destination directory is made, to console and to
@@ -15,7 +15,7 @@ of a task can be found in task.docx.
 
 ## Installation, dependencies and running script
 
-This script was written in Python 3.10.5. It might run on older versions but
+This script was written in Python 3.10.5. It might run on an older versions but
 backward compatibility wasn't tested and the script wasn't created with
 backward compatibility on mind.
 
@@ -35,12 +35,12 @@ Run command:
 python sync_dirs.py [-h] (-u {seconds, minutes, hours} -n | -o) source destination log_file
 ```
 
-Source directory should a path to directory which contents will be checked and
+Source directory should be a path to directory which contents will be checked and
 copied into destination directory if needed.
 
 Destination directory should be a path to a directory where exact replica of
-contents of a source directory. If path leads to a non-existent directory it will
-be created (also with all parent directories if needed).
+contents of a source directory will be created. If path leads to a non-existent directory
+it will be created (also with all parent directories if needed).
 
 Log_file should be a path leading to a file where the script will write all changes.
 
